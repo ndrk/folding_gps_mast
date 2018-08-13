@@ -1,43 +1,55 @@
+/*
+All configuration variables that you should need to worry about are contained in
+the following section.
+*/
 smoothness = 80;
 partGap = 0.2;
 
 baseDiskDiameter = 18;
 baseHeight = 4;
 
+numMountingFlanges = 4;
+
 flangeLength = 14;
 flangeWidth = 8;
 flangeHoleDiameter = 3;
 
-basePivotDiameter = 12;
-basePivotHeight=20;
-basePivotSlotWidth = basePivotDiameter + 1;
-basePivotSlotHeight = basePivotHeight;
-basePivotSlotLength = 4;
+cageThickness = 2;
+cageHeight = 10;
+cageSlotVertOffset = 2;
+
+clipHeight = 6;
+clipThickness = 2.5;
+
 pivotPointDiameter = 5;
 
-mastDiameter = 3;
-mastWidth = pivotPointDiameter; //3;
 mastLength = 100;
-mastRoundingDiameter = mastWidth * 1.2;
 
 platformDiameter = 35;
 platformHeight = 6;
 
+numLighteningHoles = 5;
+mastPocketThickness = 2;
+
+/*
+End of configuration variables.
+*/
+
+mastWidth = pivotPointDiameter;
+mastRoundingDiameter = mastWidth * 1.2;
+
 pivotSlotDiameter = pivotPointDiameter+partGap*2;
 pivotSlotWidth = mastWidth+partGap;
 
-cageThickness = 2;
 cageLength = pivotSlotWidth+cageThickness+4;
 cageWidth = pivotSlotWidth+cageThickness*2;
-cageHeight = 10;
 
-clipHeight = 6;
-clipThickness = 2.5;
 clipWidth = cageWidth + partGap;
 
 cageSlotHeight = clipHeight + partGap*2;
 cageSlotWidth = clipThickness + partGap*2;
-cageSlotVertOffset = 2;
+
+mastPocketOverallWidth = mastWidth + mastPocketThickness*2;
 
 //Build the assembly
 gpsMast();
@@ -46,7 +58,38 @@ module gpsMast() {
 	union() {
 		base();
 		mast();
+		platform();
     lockingClip();
+	}
+}
+
+module platform() {
+	union() {
+		// The platform body
+		difference() {
+			union() {
+				translate([0,0,mastLength])
+					cylinder(d2=platformDiameter, d1=mastWidth, h=platformHeight/2, $fn=smoothness);
+				translate([0,0,mastLength+platformHeight/2])
+					cylinder(d=platformDiameter, h=platformHeight/2, $fn=smoothness);
+				//translate([0,0,mastLength-mastWidth*2+1])
+				//	cylinder(d2=mastWidth*2, d1=0, h=mastWidth*2);
+			}
+			// Remove the 4 lightening holes
+			for(index = [0 : numLighteningHoles-1])
+				rotate([0,0,(360/numLighteningHoles)*index])
+					translate([platformDiameter/3,0, mastLength])
+						cylinder(d=platformDiameter/5, h=platformHeight, $fn=smoothness);
+		}
+		// Add the pocket for attaching to the mast
+		difference() {
+			rotate([0,0,45])
+				translate([-mastPocketOverallWidth/2, -mastPocketOverallWidth/2, 	mastLength-mastPocketOverallWidth+platformHeight/2])
+					cube(mastPocketOverallWidth,mastPocketOverallWidth,mastPocketOverallWidth);
+			rotate([0,0,45])
+				translate([-mastWidth/2, -mastWidth/2, mastLength-mastWidth-platformHeight/2+mastPocketThickness])
+					#cube(mastWidth,mastWidth, mastWidth);
+		}
 	}
 }
 
@@ -90,25 +133,6 @@ module mast() {
       rotate([90,0,0])
         translate([0,mastWidth/2,-baseDiskDiameter/2])
           cylinder(d=mastWidth, h=baseDiskDiameter, $fn=smoothness);
-      // The platform for the GPS unit
-      difference() {
-        union() {
-          translate([0,0,mastLength])
-            cylinder(d2=platformDiameter, d1=mastWidth, h=platformHeight/2, $fn=smoothness);
-          translate([0,0,mastLength+platformHeight/2])
-            cylinder(d=platformDiameter, h=platformHeight/2, $fn=smoothness);
-          translate([0,0,mastLength-mastWidth*2+1])
-            cylinder(d2=mastWidth*2, d1=0, h=mastWidth*2);
-        }
-        translate([platformDiameter/3,0, mastLength])
-          cylinder(d=platformDiameter/5, h=platformHeight, $fn=smoothness);
-        translate([-platformDiameter/3,0, mastLength])
-          cylinder(d=platformDiameter/5, h=platformHeight, $fn=smoothness);
-        translate([0, platformDiameter/3, mastLength])
-          cylinder(d=platformDiameter/5, h=platformHeight, $fn=smoothness);
-        translate([0, -platformDiameter/3, mastLength])
-          cylinder(d=platformDiameter/5, h=platformHeight, $fn=smoothness);
-      }
     }
 }
 
@@ -155,25 +179,20 @@ module base() {
 
     // Slot for pivot
     rotate([0,0,45])
-      translate([0,baseDiskDiameter/2,(pivotSlotDiameter)/2])
+      translate([0,baseDiskDiameter/2+partGap,(pivotSlotDiameter)/2])
         rotate([90,0,0])
-          cylinder(d=pivotSlotDiameter, h=baseDiskDiameter, $fn=smoothness);
-      rotate([0,0,45])
-        translate([-(pivotSlotDiameter)/2,baseDiskDiameter/2,-(pivotSlotDiameter)/2])
-          rotate([90,0,0])
-            cube([pivotSlotDiameter, pivotSlotDiameter, baseDiskDiameter]);
+          cylinder(d=pivotSlotDiameter, h=baseDiskDiameter+partGap*2, $fn=smoothness);
+    rotate([0,0,45])
+      translate([-(pivotSlotDiameter)/2,baseDiskDiameter/2+partGap,-(pivotSlotDiameter)/2])
+        rotate([90,0,0])
+          cube([pivotSlotDiameter, pivotSlotDiameter, baseDiskDiameter+partGap*2]);
   }
 }
 
 module baseMountFlanges() {
-	rotate([0,0,0])
-		baseMountFlange();
-	rotate([0,0,90])
-		baseMountFlange();
-	rotate([0,0,180])
-		baseMountFlange();
-	rotate([0,0,270])
-		baseMountFlange();
+	for(index = [0 : numMountingFlanges-1])
+		rotate([0,0,-90+(360/numMountingFlanges*index)+(numMountingFlanges % 2 ? ((360/numMountingFlanges)/2) : 0)])
+			baseMountFlange();
 }
 
 module baseMountFlange() {
