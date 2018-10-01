@@ -3,10 +3,10 @@ All configuration variables that you should need to worry about are contained in
 the following section.
 */
 // Flags to turn parts on/off when generating stl files
-bShowBase = true;
-bShowLockingClip = true;
+bShowBase = false;
+bShowLockingClip = false;
 bShowMast = true;
-bShowPlatform = true;
+bShowPlatform = false;
 
 smoothness = 80;
 partGap = 0.2;
@@ -14,9 +14,9 @@ partGap = 0.2;
 baseDiskDiameter = 18;
 baseHeight = 4;
 
-numMountingFlanges = 4;
+numMountingFlanges = 2;
 
-flangeHoleCenterOffset = 18;
+flangeHoleCenterOffset = 40/2;  //Spacing of mounting holes on erel copter base is 34 mm.
 
 flangeWidth = 8;
 flangeHoleDiameter = 3;
@@ -30,7 +30,7 @@ clipThickness = 2.5;
 
 pivotPointDiameter = 5;
 
-mastLength = 50;
+mastLength = 105;
 
 platformDiameter = 35;
 platformHeight = 6;
