@@ -3,9 +3,9 @@ All configuration variables that you should need to worry about are contained in
 the following section.
 */
 // Flags to turn parts on/off when generating stl files
-bShowBase = false;
+bShowBase = true;
 bShowLockingClip = false;
-bShowMast = true;
+bShowMast = false;
 bShowPlatform = false;
 
 smoothness = 80;
@@ -16,7 +16,7 @@ baseHeight = 4;
 
 numMountingFlanges = 2;
 
-flangeHoleCenterOffset = 40/2;  //Spacing of mounting holes on erel copter base is 34 mm.
+flangeHoleCenterOffset = 34/2;  //Spacing of mounting holes on erel copter base is 34 mm.
 
 flangeWidth = 8;
 flangeHoleDiameter = 3;
